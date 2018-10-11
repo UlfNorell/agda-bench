@@ -1,0 +1,26 @@
+name:                agda-bench
+version:             1.0.0.0
+license:             BSD3
+license-file:        LICENSE
+author:              Ulf Norell
+maintainer:          ulf.norell@gmail.com
+copyright:           Ulf Norell, 2018
+category:            Language, Performance
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+cabal-version:       >=1.10
+synopsis:            Benchmarking tool for compile-time performance of Agda
+                     programs.
+description:
+  Allows benchmarking the compile-time (type-checking time) performance of Agda
+  code. Can be given an Agda module and a term to be benchmarked, or just a
+  module in which case it will benchmark any top-level functions whose names
+  start with "bench".
+
+executable agda-bench
+  main-is:             Main.hs
+  build-depends:       base >=4.10 && <4.13,
+                       criterion >=1.4,
+                       Agda ==2.6.0
+  ghc-options:         -rtsopts -with-rtsopts=-M8G
+  default-language:    Haskell2010
