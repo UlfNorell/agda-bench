@@ -49,7 +49,7 @@ callByNameFlag opts = return opts{ useCallByName = True }
 benchBackend :: Backend' Options () () () ()
 benchBackend = Backend'
   { backendName           = "benchmark"
-  , backendVersion        = Just "0.1"
+  , backendVersion        = Just "1.0.0"
   , options               = defaultOptions
   , commandLineFlags      = [ Option ['B'] ["bench-options"] (ReqArg moreOpts "ARGS")
                                 "Benchmarking options. Use -B --help for more information."
