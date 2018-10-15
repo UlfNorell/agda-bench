@@ -17,11 +17,15 @@ description:
   `agda-bench` is a fully functional Agda compiler with some extra options for
   benchmarking.
 
+source-repository head
+  type:     git
+  location: https://github.com/UlfNorell/agda-bench.git
+
 executable agda-bench
   main-is:             Main.hs
   build-depends:       base >=4.10 && <4.13,
                        criterion >=1.4,
-                       Agda ==2.6.0
+                       Agda >=2.5.4 && <2.7
   ghc-options:         -rtsopts -with-rtsopts=-M8G
   default-language:    Haskell2010
 
