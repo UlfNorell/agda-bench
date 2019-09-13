@@ -23,7 +23,7 @@ source-repository head
 
 executable agda-bench
   main-is:             Main.hs
-  build-depends:       base >=4.10 && <4.13,
+  build-depends:       base >=4.10 && <4.14,
                        criterion >=1.4,
                        Agda >=2.5.4 && <2.7
   ghc-options:         -rtsopts -with-rtsopts=-M8G
