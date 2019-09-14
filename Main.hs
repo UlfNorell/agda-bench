@@ -4,6 +4,7 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Criterion.Main
 import Data.List
+import qualified Data.HashMap.Strict as HMap
 import System.Console.GetOpt
 import System.Environment
 
@@ -18,7 +19,6 @@ import Agda.Syntax.Position (noRange)
 import Agda.Syntax.Translation.ConcreteToAbstract
 import Agda.TheTypeChecker
 import Agda.TypeChecking.Reduce
-import qualified Agda.Utils.HashMap as HMap
 import Agda.Utils.Lens
 import Agda.Utils.Pretty (prettyShow)
 
@@ -65,10 +65,11 @@ benchBackend = Backend'
   , isEnabled             = \ _ -> True
   , preCompile            = runBenchmarks
   , postCompile           = \ _ _ _ -> return ()
-  , preModule             = \ _ _ _ -> return (Skip ())
+  , preModule             = \ _ _ _ _ -> return (Skip ())
   , postModule            = \ _ _ _ _ _ -> return ()
-  , compileDef            = \ _ _ _ -> return ()
+  , compileDef            = \ _ _ _ _ -> return ()
   , scopeCheckingSuffices = False
+  , mayEraseType          = \ _ -> return True
   }
 
 findBenchmarks :: TCM [String]
