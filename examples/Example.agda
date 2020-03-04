@@ -3,6 +3,7 @@ module Example where
 
 open import Agda.Builtin.Nat
 open import Agda.Builtin.List
+open import Agda.Builtin.Equality
 
 downFrom : Nat → List Nat
 downFrom zero    = []

@@ -19,6 +19,7 @@ module Example where
 
 open import Agda.Builtin.Nat
 open import Agda.Builtin.List
+open import Agda.Builtin.Equality
 
 downFrom : Nat → List Nat
 downFrom zero    = []
@@ -90,13 +91,25 @@ std dev              3.532 μs   (2.379 μs .. 4.833 μs)
 variance introduced by outliers: 32% (moderately inflated)
 ```
 
+Instead to measuring evaluation time you can measure type checking time of an
+expression using the `-T` (or `--type-check`) flag:
+
+```
+$ agda-bench Example.agda -T "refl : sum-rec (downFrom 100) ≡ 4950"
+time                 252.0 μs   (248.6 μs .. 255.0 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 249.7 μs   (247.1 μs .. 253.3 μs)
+std dev              9.637 μs   (7.431 μs .. 13.56 μs)
+```
+
 The full list of options (not including the Criterion options) are:
 
 ```
 benchmark backend options
-  -B ARGS  --bench-options=ARGS  Benchmarking options. Use -B --help for more information.
-  -s EXPR  --single=EXPR         Evaluate a single expression
-  -C EXPR  --custom=EXPR         Add a custom benchmark for EXPR
-  -n       --nf                  Full normalisation instead of weak-head reduction
-           --call-by-name        Use call-by-name
+  -B ARGS         --bench-options=ARGS      Benchmarking options. Use -B --help for more information.
+  -s EXPR         --single=EXPR             Evaluate a single expression
+  -C EXPR         --custom=EXPR             Add a custom benchmark for EXPR
+  -T EXPR : TYPE  --type-check=EXPR : TYPE  Add a custom benchmark to type check EXPR against TYPE
+  -n              --nf                      Full normalisation instead of weak-head reduction
+                  --call-by-name            Use call-by-name
 ```
