@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Main where
 
 import Control.Monad
-import Control.Monad.Fail (MonadFail)
+import Control.Monad.Except
 import Control.Monad.IO.Class
 import Criterion.Main
 import Data.List
@@ -13,6 +15,7 @@ import Agda.Main (runAgda)
 import Agda.Compiler.Backend
 import Agda.Compiler.Common
 import Agda.Interaction.BasicOps
+import Agda.Interaction.Options (commandLineOptions, optInputFile)
 import Agda.TypeChecking.Monad
 import Agda.TypeChecking.Pretty
 import Agda.Syntax.Internal hiding (sort, set)
@@ -21,7 +24,7 @@ import Agda.Syntax.Translation.ConcreteToAbstract
 import Agda.TheTypeChecker
 import Agda.TypeChecking.Rules.Term (isType_)
 import Agda.TypeChecking.Reduce
-import Agda.Interaction.CommandLine (withCurrentFile)
+
 import Agda.Utils.Lens
 import Agda.Utils.Pretty (prettyShow)
 import Agda.Utils.FileName
@@ -51,11 +54,11 @@ normaliseFlag opts = return opts{ fullNormalForm = True }
 callByNameFlag :: Monad m => Options -> m Options
 callByNameFlag opts = return opts{ useCallByName = True }
 
-typeCheckFlag :: MonadFail m => String -> Options -> m Options
+typeCheckFlag :: MonadError String m => String -> Options -> m Options
 typeCheckFlag s opts =
   case break (== ":") (words s) of
     (e, ":" : t) -> return opts{ typeCheckBench = (unwords e, unwords t) : typeCheckBench opts }
-    _ -> fail "Usage: --type-check \"EXPR : TYPE\""
+    _ -> throwError "Usage: --type-check \"EXPR : TYPE\""
 
 benchBackend :: Backend' Options () () () ()
 benchBackend = Backend'
@@ -133,6 +136,17 @@ typeCheckExpr (e, t) = do
 tcmToIO :: TCM a -> TCM (IO a)
 tcmToIO m = TCM $ \ s e -> return (unTCM m s e)
 
+-- | Set 'envCurrentPath' to 'optInputFile'.
+withCurrentFile :: TCM a -> TCM a
+withCurrentFile cont = do
+  mpath <- getInputFile
+  localTC (\ e -> e { envCurrentPath = mpath }) cont
+
+-- | Return the 'optInputFile' as 'AbsolutePath', if any.
+getInputFile :: TCM (Maybe AbsolutePath)
+getInputFile = mapM (liftIO . absolute) =<< do
+  optInputFile <$> commandLineOptions
+
 printExpr :: Options -> Int -> String -> TCM ()
 printExpr opts n s = atTopLevel $ do
   e <- concreteToAbstract_ =<< parseExpr noRange s
@@ -149,4 +163,3 @@ normaliseExpr norm s = atTopLevel $ do
     seq v $ return ()
 
 main = runAgda [Backend benchBackend]
-
