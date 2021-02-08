@@ -15,8 +15,12 @@ import Agda.Main (runAgda)
 import Agda.Compiler.Backend
 import Agda.Compiler.Common
 import Agda.Interaction.BasicOps
-import Agda.Interaction.Options (commandLineOptions, optInputFile)
-import Agda.TypeChecking.Monad
+import qualified Agda.Interaction.Options as O
+import Agda.TypeChecking.Monad as O
+  -- NB: In Agda-2.6.2, commandLineOptions has moved
+  -- from Agda.TypeChecking.Monad to Agda.Interaction.Options.
+  -- Importing module as O is a hack to cover both
+  -- 2.6.2 and previous versions of Agda without #if.
 import Agda.TypeChecking.Pretty
 import Agda.Syntax.Internal hiding (sort, set)
 import Agda.Syntax.Position (noRange)
@@ -139,13 +143,15 @@ tcmToIO m = TCM $ \ s e -> return (unTCM m s e)
 -- | Set 'envCurrentPath' to 'optInputFile'.
 withCurrentFile :: TCM a -> TCM a
 withCurrentFile cont = do
-  mpath <- getInputFile
+  mpath <- getInputFile_
   localTC (\ e -> e { envCurrentPath = mpath }) cont
 
+-- N.B.: Just getInputFile clashes with
+-- Agda.TypeChecking.Monad.getInputFile of Agda-2.6.1.
 -- | Return the 'optInputFile' as 'AbsolutePath', if any.
-getInputFile :: TCM (Maybe AbsolutePath)
-getInputFile = mapM (liftIO . absolute) =<< do
-  optInputFile <$> commandLineOptions
+getInputFile_ :: TCM (Maybe AbsolutePath)
+getInputFile_ = mapM (liftIO . absolute) =<< do
+  O.optInputFile <$> O.commandLineOptions
 
 printExpr :: Options -> Int -> String -> TCM ()
 printExpr opts n s = atTopLevel $ do
