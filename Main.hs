@@ -1,10 +1,14 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, DeriveGeneric, DeriveAnyClass #-}
 
 module Main where
+
+import GHC.Generics (Generic)
+import Control.DeepSeq
 
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.IO.Class
+
 import Criterion.Main
 import Data.List
 import qualified Data.HashMap.Strict as HMap
@@ -38,7 +42,8 @@ data Options = Options { criterionOptions :: [String]
                        , customBench      :: [String]
                        , typeCheckBench   :: [(String, String)]
                        , useCallByName    :: Bool
-                       , fullNormalForm   :: Bool }
+                       , fullNormalForm   :: Bool
+                       } deriving (Generic, NFData)
 
 defaultOptions :: Options
 defaultOptions = Options [] Nothing [] [] False False
